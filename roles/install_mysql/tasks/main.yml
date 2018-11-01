@@ -1,0 +1,49 @@
+---
+# tasks file for install_mysql
+- name: Install MySQL and packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - mysql-server-5.7
+    - mysql-client-5.7
+    - python-mysqldb
+    - libmysqlclient-dev
+
+- name: Create database for Confluence
+  mysql_db:
+    name: "{{db_name}}"
+    state: present
+    collation: utf8_bin
+
+- name: Create a database user
+  mysql_user:
+    name: "{{db_user}}"
+    password: "{{db_user_password}}"
+    priv: "{{db_name}}.*:ALL"
+    host: localhost
+
+- name: Update MySQL root password for all root accounts
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    password: "{{ mysql_root_pass }}"
+    state: present
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: Copy config for MYSQL
+  template:
+    src: mysqld.cnf
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+    owner: root
+    mode: 0644
+
+- name: Restart MySQL
+  command: /bin/true
+  notify:
+    - Restart MySQL

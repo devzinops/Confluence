@@ -1,0 +1,26 @@
+---
+# tasks file for install_java
+- name: Add Oracle Java Repository
+  apt_repository:
+    repo: ppa:webupd8team/java
+    state: present
+
+- name: apt-get update
+  apt:
+    update_cache: yes
+
+- name: set licence selected
+  shell: /bin/echo debconf shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+
+- name: set licence seen
+  shell: /bin/echo debconf shared/accepted-oracle-license-v1-1 seen true | /usr/bin/debconf-set-selections
+
+- name: Install Oracle Java 8
+  apt:
+    name: oracle-java8-installer
+    state: latest
+    force: yes
+    update_cache: yes
+
+- name: Add JAVA_HOME to PATH
+  shell: echo "JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre/bin/java"" >> /etc/environment

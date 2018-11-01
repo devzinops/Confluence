@@ -1,0 +1,8 @@
+---
+- name: confluence
+  become: yes
+  hosts: all
+  roles:
+    - install_mysql
+    - install_java
+    - install_confluence

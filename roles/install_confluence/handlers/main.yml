@@ -1,0 +1,4 @@
+---
+# handlers file for install_confluence
+- name: Restart Confluence
+  command: /etc/init.d/confluence restart

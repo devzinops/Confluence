@@ -1,0 +1,27 @@
+---
+# tasks file for install_confluence
+
+- name: Download Confluence installer
+  get_url:
+    url: https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-6.12.0-x64.bin
+    dest: /tmp/atlassian-confluence-6.12.0-x64.bin
+    mode: a+x
+
+- name: Copy configuration files for installer
+  template:
+    src: response.varfile
+    dest: /tmp/response.varfile
+
+- name: Install Confluence
+  command: /tmp/atlassian-confluence-6.12.0-x64.bin -q -varfile response.varfile
+
+- name: Download Database JDBC Drivers and unarchive
+  unarchive:
+    src: https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.47.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy Database JDBC Drivers
+  command: cp /tmp/mysql-connector-java-5.1.47/mysql-connector-java-5.1.47.jar /opt/atlassian/confluence/confluence/WEB-INF/lib/
+  notify:
+    - Restart Confluence
